@@ -96,7 +96,8 @@ final class Switcher {
             }
             everFound = true
 
-            if config.backend != .external {
+            var readFailed = false
+            if config.backend != .external && m.reliableReadback {
                 do {
                     let cur = try d.read(vcp: m.vcpCode, address: addr).current
                     Log.debug("[\(m.name)] read VCP \(hex(m.vcpCode)) = \(hex16(cur))")
@@ -105,16 +106,20 @@ final class Switcher {
                 } catch {
                     Log.debug("[\(m.name)] read failed: \(error)")
                     lastError = "\(error)"
+                    readFailed = true
                 }
             }
             if attempt == config.retries { break }   // last pass is verification only
             if wroteOK && !config.verifyReadback { return .sentUnverified }
+            // Monitors often refuse DDC for 1-2 s while changing input. After a successful write, an
+            // unreadable monitor is still busy: wait for the next check instead of re-sending (which can restart the switch).
+            if wroteOK && readFailed { continue }
 
             do {
                 try write(m, display: d, value: want, config: config)
                 wroteOK = true
                 Log.info("[\(m.name)] wrote VCP \(hex(m.vcpCode)) = \(hex16(want)) (attempt \(attempt + 1))")
-                if !config.verifyReadback { return .sentUnverified }
+                if !config.verifyReadback || !m.reliableReadback { return .sentUnverified }
                 if config.backend == .external { return .sentUnverified }   // external tools can't read back reliably
             } catch {
                 lastError = "\(error)"

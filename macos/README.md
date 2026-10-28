@@ -49,6 +49,7 @@ The menu bar menu shows the sentinel state and the last switch result. It also h
 - **Retry with backoff + verification**: it retries on the `retry_delays_ms` schedule (default 300/600/1200 ms) and reads the input back after each write. Displays are re-enumerated on every attempt. A monitor that drops off after being switched away counts as "sent, not verified", not as a failure.
 - **Monitor identification**: by EDID manufacturer + model (product name or numeric product ID) + serial (numeric or alphanumeric; leave it empty to match any).
 - **Sentinel group**: the group counts as present if any listed VID:PID is connected.
+- **Unreliable readout**: set `reliable_readback = false` on a monitor whose VCP 0x60 readout can't be trusted. The AOC 24G1WG4 reports `0x11` whatever input it is on. The agent then always writes and doesn't verify. In this setup the 24G1WG4 also uses `mac_input = 0x12` (HDMI 2); see `../windows/README.md`.
 - **LG 0xF4**: set `vcp_code = 0xF4`. The DDC sub-address then defaults to 0x50, as MonitorControl and m1ddc do. You can override it with `i2c_address`.
 - **Fallback**: with `ddc_backend = "auto"`, a failed native write falls back to `external_command`. The default command is m1ddc (`brew install m1ddc`). For BetterDisplay, set something like `external_command = "betterdisplaycli set --name='{product}' --ddc --vcp=0x60 --value={value}"`. Check the exact syntax with `betterdisplaycli help`.
 - **Start at login**: the LaunchAgent restarts the agent after a crash. Quitting from the menu keeps it quit.

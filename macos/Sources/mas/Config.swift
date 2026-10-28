@@ -9,6 +9,9 @@ struct MonitorConfig {
     var i2cAddress: UInt8? = nil      // defaults to 0x51, or 0x50 for LG's 0xF4
     var macInput: UInt16 = 0x11
     var pcInput: UInt16 = 0x0F
+    /// false for monitors whose VCP 0x60 readout lies (e.g. AOC 24G1WG4 keeps reporting HDMI while on DP):
+    /// always write, never skip as "already there", don't verify.
+    var reliableReadback = true
 
     var effectiveI2CAddress: UInt8 { i2cAddress ?? (vcpCode == 0xF4 ? 0x50 : 0x51) }
 
@@ -91,6 +94,7 @@ struct Config {
             if let v = t["i2c_address"] as? Int { m.i2cAddress = UInt8(truncatingIfNeeded: v) }
             if let v = t["mac_input"] as? Int { m.macInput = UInt16(truncatingIfNeeded: v) }
             if let v = t["pc_input"] as? Int { m.pcInput = UInt16(truncatingIfNeeded: v) }
+            if let v = t["reliable_readback"] as? Bool { m.reliableReadback = v }
             c.monitors.append(m)
         }
         return c
