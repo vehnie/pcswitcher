@@ -1,6 +1,6 @@
 # Monitor Auto-Switch — Windows agent
 
-This is the Windows half of `monitor-auto-switch-spec.pdf`, and it mirrors the macOS agent in `../macos`: same config schema, same commands, same switching logic. It watches the sentinel USB device(s) behind the USB switch. When the sentinel appears on this PC, every configured monitor goes to `pc_input` (DisplayPort). When it disappears, they go to `mac_input` (HDMI).
+This is the Windows half of [Monitor Auto-Switch](../README.md), and it mirrors the macOS agent in `../macos`: same config schema, same commands, same switching logic. It watches the sentinel USB device(s) behind the USB switch. When the sentinel appears on this PC, every configured monitor goes to `pc_input` (DisplayPort). When it disappears, they go to `mac_input` (HDMI).
 
 It is built with the C# compiler that ships with Windows (.NET Framework 4.8), so there is no SDK to install and nothing for the exe to depend on.
 

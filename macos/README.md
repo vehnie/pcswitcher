@@ -1,6 +1,6 @@
 # Monitor Auto-Switch — macOS agent
 
-This is the macOS half of `monitor-auto-switch-spec.pdf`. It watches for a "sentinel" USB device that sits behind the UGREEN USB switch. When the sentinel appears on this Mac, it switches every configured monitor to its Mac input (HDMI) over DDC/CI. When the sentinel disappears, it switches them to the PC input (DisplayPort).
+This is the macOS half of [Monitor Auto-Switch](../README.md). It watches for a "sentinel" USB device that sits behind the USB switch. When the sentinel appears on this Mac, it switches every configured monitor to its Mac input (HDMI) over DDC/CI. When the sentinel disappears, it switches them to the PC input (DisplayPort).
 
 It is a single Swift binary (`mas`) that runs either as a menu bar agent or as a diagnostic CLI. It is built for arm64, so the same binary runs on the M2 Pro and on the M5.
 
@@ -42,7 +42,7 @@ mas install-agent | uninstall-agent
 
 The menu bar menu shows the sentinel state and the last switch result. It also has these items: Switch to Mac now, Switch to PC now, Pause, Open config, Reload config, Open log, Start at login, and Quit.
 
-## Behaviour (spec §3.2)
+## Behaviour
 
 - **Debounce**: acts on the settled sentinel state `debounce_ms` after the last USB event. It only acts when the settled state actually changed, so it never switches at startup or on wake.
 - **Idempotent**: it reads the input VCP code first and skips the write if the monitor is already on the target input.
