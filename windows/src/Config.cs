@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -55,7 +55,7 @@ namespace MonitorAutoSwitch
     class Config
     {
         public List<Sentinel> Sentinels = new List<Sentinel>();
-        public int DebounceMs = 500;
+        public int DebounceMs = 100;
         public int Retries = 3;
         public List<int> RetryDelaysMs = new List<int> { 300, 600, 1200 };
         public bool VerifyReadback = true;
@@ -140,7 +140,7 @@ namespace MonitorAutoSwitch
 # The group counts as ""present"" if ANY of them is connected.
 sentinels = []
 
-debounce_ms     = 500
+debounce_ms     = 100   # act on the first sentinel arrival / last departure; keep short
 retries         = 3
 retry_delays_ms = [300, 600, 1200]
 verify_readback = true

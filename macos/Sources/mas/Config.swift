@@ -37,7 +37,7 @@ enum DDCBackend: String {
 
 struct Config {
     var sentinels: [(vid: Int, pid: Int)] = []
-    var debounceMs = 500
+    var debounceMs = 100
     var retries = 3
     var retryDelaysMs = [300, 600, 1200]
     var verifyReadback = true
@@ -109,7 +109,7 @@ struct Config {
         # The group counts as "present" if ANY of them is connected.
         sentinels = []
 
-        debounce_ms     = 500
+        debounce_ms     = 100   # act on the first sentinel arrival / last departure; keep short
         retries         = 3
         retry_delays_ms = [300, 600, 1200]
         verify_readback = true
