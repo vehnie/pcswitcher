@@ -36,6 +36,17 @@ Both agents always agree on the target, which is the computer that just gained t
 - **Rotating log** explaining why each switch did or didn't happen.
 - **No dependencies**: the Windows agent builds with the C# compiler that ships with Windows, and the macOS agent is a single Swift binary.
 
+## Download
+
+Prebuilt binaries are on the [Releases page](https://github.com/vehnie/pcswitcher/releases/latest):
+
+- `MonitorAutoSwitch-windows.zip`: `mas.exe` (CLI) and `MonitorAutoSwitch.exe` (tray agent)
+- `MonitorAutoSwitch-macos-arm64.zip`: `mas` for Apple Silicon Macs
+
+Each zip has an `INSTALL.txt`. The binaries are unsigned. On Windows, SmartScreen may ask you to confirm; choose *More info* → *Run anyway*. On macOS, run `xattr -d com.apple.quarantine mas` once.
+
+Or build from source:
+
 ## Quick start
 
 ### Windows

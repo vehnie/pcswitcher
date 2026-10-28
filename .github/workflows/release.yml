@@ -1,0 +1,77 @@
+name: Build & release
+
+# Push a tag like v0.1.0 to build both agents and publish a GitHub Release.
+# Run it manually (Actions tab) to just build and download the artifacts.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        working-directory: macos
+        run: swift build -c release --arch arm64
+      - name: Package
+        run: |
+          mkdir -p dist/MonitorAutoSwitch-macos-arm64
+          cp macos/.build/release/mas dist/MonitorAutoSwitch-macos-arm64/
+          cp macos/README.md LICENSE dist/MonitorAutoSwitch-macos-arm64/
+          cat > dist/MonitorAutoSwitch-macos-arm64/INSTALL.txt <<'TXT'
+          mkdir -p ~/.local/bin && cp mas ~/.local/bin/
+          xattr -d com.apple.quarantine ~/.local/bin/mas   # binary is unsigned
+          ~/.local/bin/mas init-config      # then edit sentinels / inputs
+          ~/.local/bin/mas list-monitors    # check DDC works
+          ~/.local/bin/mas install-agent    # start at login
+          TXT
+          cd dist && zip -r MonitorAutoSwitch-macos-arm64.zip MonitorAutoSwitch-macos-arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/MonitorAutoSwitch-macos-arm64.zip
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: pwsh
+        run: ./windows/build.ps1
+      - name: Package
+        shell: pwsh
+        run: |
+          $out = 'dist/MonitorAutoSwitch-windows'
+          New-Item -ItemType Directory -Force $out | Out-Null
+          Copy-Item windows/bin/mas.exe, windows/bin/MonitorAutoSwitch.exe, windows/README.md, LICENSE $out
+          @(
+            'Copy this folder to %LOCALAPPDATA%\Programs\MonitorAutoSwitch, then:'
+            '  mas.exe init-config      (then edit sentinels / inputs)'
+            '  mas.exe list-monitors    (check DDC works)'
+            '  mas.exe install-agent    (start at login)'
+            'The exes are unsigned: SmartScreen may ask you to confirm ("More info" -> "Run anyway").'
+          ) | Set-Content "$out/INSTALL.txt"
+          Compress-Archive -Path $out -DestinationPath dist/MonitorAutoSwitch-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/MonitorAutoSwitch-windows.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
